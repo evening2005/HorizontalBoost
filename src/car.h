@@ -1,8 +1,9 @@
 #pragma once
+
 #include "pge_sprite.h"
 
-#define CAR_WIDTH (17)
-#define CAR_LENGTH (30)
+/*
+
 #define STEER_AMOUNT (1)
 #define STEER_SLOWDOWN (0)
 #define REAR_END_PENALTY (1)
@@ -18,6 +19,10 @@
 #define MAX_NPCS (6)
 
 #define min(a, b) ((a) <= (b) ? (a) : (b))
+*/
+
+#define CAR_LENGTH (30)
+#define CAR_WIDTH (11)
 
 // currentSpeed is maintained in the upper byte of currentSpeed
 struct CAR {
@@ -39,16 +44,17 @@ struct CAR {
 
 typedef struct CAR carType;
 
+void position_car(carType *car);
+void initialise_car(carType *carPtr, int resourceID, GColor colour, char *name);
 
+/*
 int get_camera_focus();
 void set_player_car(carType *pc);
-void initialise_car(carType *carPtr, int resourceID, GColor colour, char *name);
 
 void update_boost_ui(GContext *ctx);
 void draw_cars(GContext *ctx);
 void delete_cars();
 void car_frame_update();
-void position_car(carType *car);
 void car_add_to_grid(carType *carPtr);
 void set_up_steering_guide();
 void set_race_start_time();
@@ -71,3 +77,4 @@ void set_up_starting_positions();
 GPoint get_starting_position(uint32_t num);
 
 
+*/

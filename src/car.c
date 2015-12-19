@@ -1,8 +1,12 @@
+
+
 #include "pge.h"
 #include "car.h"
 #include "track.h"
 #include "pge_collision.h"
 #include "statemachine.h"
+
+/*
 
 static carType *playerCar;
 static carType *startingGrid[MAX_NPCS + 1]; 
@@ -459,15 +463,6 @@ int player_screen_position() {
     return playerScreenPosY;
 }
 
-// Your xPos comes from your carType struct
-//  But your yPos is defined by your yPos 
-//  relative to playerCar 
-void position_car(carType *carPtr) {
-    GPoint screenPosition;
-    screenPosition.x = TRACK_CENTRE_LINE + carPtr->worldPosition.x - (CAR_WIDTH / 2);
-    screenPosition.y = get_camera_focus() - carPtr->worldPosition.y + player_screen_position();
-    carPtr->sprite->position = screenPosition;
-}
 
 void drive_car(carType *carPtr) {
     if(carPtr == playerCar) {
@@ -578,18 +573,6 @@ GPoint get_starting_position(uint32_t num) {
 } 
 
 
-// This is done at the start of each race
-void reset_car(carType *carPtr) {
-    carPtr->worldPosition = carPtr->startingPosition;
-    carPtr->boosting = false;
-    carPtr->boostStartMillis = get_milli_time();
-    carPtr->lastBoostMillis = get_milli_time();
-    carPtr->boostDurationMillis = 0;
-    carPtr->rank = 1;
-    carPtr->currentSpeed = 0;
-    carPtr->finished = 0; 
-    position_car(carPtr);
-}
 
 
 
@@ -611,6 +594,39 @@ void place_cars_on_grid() {
     updateOnceAfterFinishing = false;
 }
 
+*/
+
+uint64_t get_milli_time() {
+    time_t seconds;
+    uint16_t millis;
+    time_ms(&seconds, &millis);
+    return (seconds * 1000 + millis);          
+}
+
+
+// Your xPos comes from your carType struct
+//  But your yPos is defined by your yPos 
+//  relative to playerCar 
+void position_car(carType *carPtr) {
+    GPoint screenPosition;
+    screenPosition.x = 56; // = TRACK_CENTRE_LINE + carPtr->worldPosition.x - (CAR_WIDTH / 2);
+    screenPosition.y = 80; // get_camera_focus() - carPtr->worldPosition.y + player_screen_position();
+    carPtr->sprite->position = screenPosition;
+}
+
+// This is done at the start of each race
+void reset_car(carType *carPtr) {
+    carPtr->worldPosition = carPtr->startingPosition;
+    carPtr->boosting = false;
+    carPtr->boostStartMillis = get_milli_time();
+    carPtr->lastBoostMillis = get_milli_time();
+    carPtr->boostDurationMillis = 0;
+    carPtr->rank = 1;
+    carPtr->currentSpeed = 0;
+    carPtr->finished = 0; 
+    position_car(carPtr);
+}
+
 
 
 // This stuff gets done only once
@@ -621,6 +637,7 @@ void initialise_car(carType *carPtr, int resourceID, GColor colour, char *name) 
     carPtr->carColour = colour;
     reset_car(carPtr);
 }
+
 
 
 

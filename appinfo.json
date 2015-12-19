@@ -9,6 +9,22 @@
     "resources": {
         "media": [
             {
+                "file": "images/kerbR.png",
+                "name": "HB_RIGHT_KERB",
+                "targetPlatforms": [
+                    "basalt"
+                ],
+                "type": "bitmap"
+            },
+            {
+                "file": "images/kerbL.png",
+                "name": "HB_LEFT_KERB",
+                "targetPlatforms": [
+                    "basalt"
+                ],
+                "type": "bitmap"
+            },
+            {
                 "file": "images/orangecar.png",
                 "name": "ORANGE_CAR",
                 "targetPlatforms": [

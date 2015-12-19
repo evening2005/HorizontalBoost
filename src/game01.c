@@ -1,6 +1,5 @@
 /**
  * This is the bare minimum to make a looping game with PGE!
- */
 
 #include <pebble.h>
  
@@ -25,7 +24,7 @@ carType yellowTruck;
 carType greenTruck;
 
 
-static void game_logic() {
+static void OLD_game_logic() {
     // Per-frame game logic here
     if(get_current_state() == STATE_BEFORERACE) {
         make_pos_gap_ui(gameWindow);
@@ -42,7 +41,7 @@ static void game_logic() {
     }
 }
 
-static void game_draw(GContext *ctx) {
+static void OLD_game_draw(GContext *ctx) {
     graphics_context_set_compositing_mode(ctx, GCompOpSet);
     // Per-frame game rendering here
     if(get_current_state() == STATE_RACING) { 
@@ -55,7 +54,7 @@ static void game_draw(GContext *ctx) {
     }
 }
 
-static void game_click(int buttonID, bool longClick) {
+static void OLD_game_click(int buttonID, bool longClick) {
     if(buttonID == BUTTON_ID_SELECT) {
         if(get_current_state() == STATE_AFTERRACE) {
             race_result_destroy_assets();
@@ -67,7 +66,7 @@ static void game_click(int buttonID, bool longClick) {
 
 
 
-void pge_init() {
+void OLD_pge_init() {
     // Load the results backdrop
     load_result_backdrop_and_font();
     // Load the finishing line bitmap
@@ -101,7 +100,7 @@ void pge_init() {
     gameWindow = pge_get_window();
 }
 
-void pge_deinit() {
+void OLD_pge_deinit() {
     // Finish the game
     delete_cars();
     destroy_pos_gap_ui();
@@ -114,3 +113,6 @@ void pge_deinit() {
     pge_finish();
 }
 
+
+
+*/

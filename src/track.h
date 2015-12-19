@@ -2,7 +2,7 @@
 
 #include <pebble.h>
 
-/* BARRIER INFORMATION */
+// BARRIER INFORMATION 
 
 #define BARRIER_LEFT (8)
 #define BARRIER_LENGTH (32)
@@ -21,12 +21,11 @@
 
 
 
-GBitmap *finishLine;
+// GBitmap *finishLine;
 void load_finish_line_bitmap();
-void draw_track(GContext *ctx, int playerPosition);
-void draw_finish_line(GContext *ctx, int playerPosition);
+//void draw_track(GContext *ctx, int playerPosition);
+//void draw_finish_line(GContext *ctx, int playerPosition);
 bool car_crossed_line(GRect carRect);
-void set_up_distance_markers();
-
+// void set_up_distance_markers();
 
 

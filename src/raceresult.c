@@ -78,11 +78,11 @@ void race_result_populate_position_layers(GContext *ctx) {
         Layer *windowLayer = window_get_root_layer(gameWindow);
         int rank;
         for(rank = 0; rank < PODIUM_POSITIONS; rank++) {
-            carType *whichCar;
-            whichCar = get_finisher(rank);
-            snprintf(positionTexts[rank], 23, "%2d%s - %2d.%03d", rank+1, get_position_suffix(rank), (int)whichCar->finished / 1000, (int)whichCar->finished % 1000);
-            text_layer_set_background_color(positionLayers[rank], whichCar->carColour);
-            text_layer_set_text_color(positionLayers[rank], gcolor_legible_over(whichCar->carColour));
+            //carType *whichCar;
+            //whichCar = get_finisher(rank);
+            //snprintf(positionTexts[rank], 23, "%2d%s - %2d.%03d", rank+1, get_position_suffix(rank), (int)whichCar->finished / 1000, (int)whichCar->finished % 1000);
+            //text_layer_set_background_color(positionLayers[rank], whichCar->carColour);
+            //text_layer_set_text_color(positionLayers[rank], gcolor_legible_over(whichCar->carColour));
             text_layer_set_text(positionLayers[rank], positionTexts[rank]);  
             layer_add_child(windowLayer, (Layer *)positionLayers[rank]);
             GRect fromFrame = layer_get_frame((Layer *)positionLayers[rank]);

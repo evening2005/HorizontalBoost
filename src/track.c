@@ -1,3 +1,4 @@
+/*
 #include <pebble.h>
 #include "track.h"
 #include "pge_sprite.h"
@@ -114,5 +115,5 @@ void draw_track(GContext *ctx, int cameraFocus) {
     draw_barriers(ctx, cameraFocus);
 }
 
-
+*/
 
