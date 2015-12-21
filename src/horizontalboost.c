@@ -12,33 +12,37 @@
 
 static Window *gameWindow;
 carType blueCar;
+carType orangeCar;
+carType yellowCar;
+carType greenCar;
+carType blackCar;
+carType blackTruck;
+carType orangeTruck;
+carType yellowTruck;
+carType greenTruck;
 
 
 
 static void game_logic() {
     // Per-frame game logic here
     if(get_current_state() == STATE_BEFORERACE) {
+        place_cars_on_grid();
+        set_race_start_time();
         switch_on_light();
         set_current_state(STATE_RACING);        
     } else if(get_current_state() == STATE_RACING) {
-
+        car_frame_update();
     } else if(get_current_state() == STATE_AFTERRACE) {
         psleep(100); // Trying to save the battery!
     }
 }
 
-static GPoint pos = {0, 0};
-
 static void game_draw(GContext *ctx) {
     graphics_context_set_compositing_mode(ctx, GCompOpSet);
     // Per-frame game rendering here
     if(get_current_state() == STATE_RACING) {
-        pos.x = pos.x % 32;
-        pos.x += 17;
-        draw_track(ctx, pos);
-        position_car(&blueCar);
-        pge_sprite_draw(blueCar.sprite, ctx);
-
+        draw_track(ctx, get_camera_focus());
+        draw_cars(ctx);
     } else if(get_current_state() == STATE_AFTERRACE) {
         // This actually only gets done once
 
@@ -59,9 +63,21 @@ void pge_init() {
     srand(time(NULL));
     load_kerb_bitmaps();
     initialise_car(&blueCar, RESOURCE_ID_BLUE_CAR, GColorCadetBlue, "Player");    
-    
-    // NB !!!!!  This is temporary !!!! It should be BEFORERACE  !!!!!
-    set_current_state(STATE_RACING);
+    set_player_car(&blueCar);
+    initialise_car(&orangeCar, RESOURCE_ID_ORANGE_CAR, GColorOrange, "Orange");
+    car_add_to_grid(&orangeCar);
+    initialise_car(&yellowCar, RESOURCE_ID_YELLOW_CAR, GColorYellow, "Yellow");    
+    car_add_to_grid(&yellowCar);
+    initialise_car(&greenCar, RESOURCE_ID_GREEN_CAR, GColorGreen, "Green");    
+    car_add_to_grid(&greenCar);
+    initialise_car(&orangeTruck, RESOURCE_ID_ORANGE_TRUCK, GColorOrange, "OrangeT");
+    car_add_to_grid(&orangeTruck);
+    initialise_car(&yellowTruck, RESOURCE_ID_YELLOW_TRUCK, GColorYellow, "YellowT");    
+    car_add_to_grid(&yellowTruck);
+    initialise_car(&greenTruck, RESOURCE_ID_GREEN_TRUCK, GColorGreen, "GreenT");    
+    car_add_to_grid(&greenTruck);
+
+    set_current_state(STATE_BEFORERACE);
     // Start the game
     pge_begin(GColorDarkGray, game_logic, game_draw, game_click);
     // Keep a Window reference for adding other UI
@@ -70,7 +86,7 @@ void pge_init() {
 
 void pge_deinit() {
     // Finish the game
-    pge_sprite_destroy(blueCar.sprite);
+    delete_cars();
     destroy_kerb_bitmaps();
     light_off(NULL);
     pge_finish();

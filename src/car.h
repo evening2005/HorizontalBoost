@@ -2,7 +2,6 @@
 
 #include "pge_sprite.h"
 
-/*
 
 #define STEER_AMOUNT (1)
 #define STEER_SLOWDOWN (0)
@@ -19,10 +18,16 @@
 #define MAX_NPCS (6)
 
 #define min(a, b) ((a) <= (b) ? (a) : (b))
-*/
+
 
 #define CAR_LENGTH (30)
 #define CAR_WIDTH (11)
+
+// This must be set up specifically based on the width of the track and the 
+//  width of the cars..
+#define GRID_WIDTH  (5)
+#define GRID_DEPTH  (2)
+#define INTER_GRID_GAP (4)
 
 // currentSpeed is maintained in the upper byte of currentSpeed
 struct CAR {
@@ -46,35 +51,26 @@ typedef struct CAR carType;
 
 void position_car(carType *car);
 void initialise_car(carType *carPtr, int resourceID, GColor colour, char *name);
+void set_player_car(carType *pc);
+int get_camera_focus();
+void draw_cars(GContext *ctx);
+void car_frame_update();
+
+void place_cars_on_grid();
+void set_up_starting_positions();
+GPoint get_starting_position(uint32_t num);
+void delete_cars();
+void car_add_to_grid(carType *carPtr);
+void set_race_start_time();
 
 /*
-int get_camera_focus();
-void set_player_car(carType *pc);
 
 void update_boost_ui(GContext *ctx);
-void draw_cars(GContext *ctx);
-void delete_cars();
-void car_frame_update();
-void car_add_to_grid(carType *carPtr);
 void set_up_steering_guide();
-void set_race_start_time();
 
 void make_pos_gap_ui(Window *window);
 void destroy_pos_gap_ui();
 // This is called from raceresult.c
 carType *get_finisher(int rank);
-
-// This must be set up specifically based on the width of the track and the 
-//  width of the cars..
-#define GRID_WIDTH  (5)
-#define GRID_DEPTH  (2)
-#define INTER_GRID_GAP (4)
-
-
-
-void place_cars_on_grid();
-void set_up_starting_positions();
-GPoint get_starting_position(uint32_t num);
-
 
 */
