@@ -138,8 +138,8 @@ void delete_cars() {
 
 void make_car_rect(const carType *carPtr, GRect *tempRect) {
     tempRect->origin = carPtr->worldPosition;
-    tempRect->size.w = CAR_WIDTH;
-    tempRect->size.h = CAR_LENGTH;
+    tempRect->size.h = CAR_WIDTH;
+    tempRect->size.w = CAR_LENGTH;
 }
 
 static int cameraFocus;
@@ -199,7 +199,7 @@ void sort_cars() {
     carType *temp;
     for(i=0; i < howManyNPCs; i++) {
         for(j=i+1; j < howManyNPCs + 1; j++) {
-            if(sortedGrid[j]->worldPosition.y > sortedGrid[i]->worldPosition.y) {
+            if(sortedGrid[j]->worldPosition.x > sortedGrid[i]->worldPosition.x) {
                 temp = sortedGrid[i]; 
                 sortedGrid[i] = sortedGrid[j];
                 sortedGrid[j] = temp;
@@ -247,11 +247,11 @@ void draw_cars(GContext *ctx) {
 bool car_check_forward_movement(const carType *carPtr, int amount) {
     GRect rectUs, rectThem;
     make_car_rect(carPtr, &rectUs);
-    rectUs.origin.y += amount;
+    rectUs.origin.x += amount;
 
     int c;
     for(c=0; c <= howManyNPCs; c++) {
-        if(sortedGrid[c] == carPtr) break; // The rest of the cars are behind us!
+        if(sortedGrid[c] == carPtr) break; 
         make_car_rect(sortedGrid[c], &rectThem);
         
         if(pge_collision_rectangle_rectangle(&rectUs, &rectThem)) {
@@ -411,7 +411,7 @@ void ai_steering(carType *carPtr) {
     if(carPtr->rank != 0) {
         // Try to steer so we can overtake the car in front!
         carType *carInFront = sortedGrid[carPtr->rank-1];
-        if((carInFront->worldPosition.x - carPtr->worldPosition.x) < 200) {
+        if((carInFront->worldPosition.x - carPtr->worldPosition.x) < 150) {
             // We have to worry about the car in front
             int diffFront = (carInFront->sprite->position.y - carPtr->sprite->position.y);
             if(abs(diffFront) <= (CAR_WIDTH+1)) {
@@ -424,7 +424,7 @@ void ai_steering(carType *carPtr) {
                     }
                 } else if(diffFront > 0) {
                     // Car in front is to our right, so steer left (but not if too close to barrier)
-                    if(carInFront->sprite->position.y <= (IBL + CAR_WIDTH)) {
+                    if(carInFront->sprite->position.y <= (TRACK_CENTRE_LINE + (CAR_WIDTH/2))) {
                         carPtr->worldPosition.y = car_steer(carPtr, +STEER_AMOUNT);
                     } else {
                         carPtr->worldPosition.y = car_steer(carPtr, -STEER_AMOUNT);
@@ -521,8 +521,8 @@ void car_frame_update() {
 
 
 
-#define PLAYERFIRSTSCREENX (96)
-#define PLAYERLASTSCREENX (4)
+#define PLAYERFIRSTSCREENX (90)
+#define PLAYERLASTSCREENX (12)
 #define PLAYERMIDSCREENX (56)
 static int playerScreenPosX = PLAYERMIDSCREENX;
 
@@ -648,7 +648,7 @@ int player_screen_position() {
 void position_car(carType *carPtr) {
     GPoint screenPosition;
     screenPosition.y = TRACK_CENTRE_LINE + carPtr->worldPosition.y - (CAR_WIDTH / 2);
-    screenPosition.x = get_camera_focus() - carPtr->worldPosition.x + player_screen_position();
+    screenPosition.x = -(get_camera_focus() - carPtr->worldPosition.x) + player_screen_position();
     carPtr->sprite->position = screenPosition;
 }
 

@@ -21,13 +21,13 @@
 
 
 #define CAR_LENGTH (30)
-#define CAR_WIDTH (11)
+#define CAR_WIDTH (17)
 
 // This must be set up specifically based on the width of the track and the 
 //  width of the cars..
 #define GRID_WIDTH  (5)
 #define GRID_DEPTH  (2)
-#define INTER_GRID_GAP (4)
+#define INTER_GRID_GAP (10)
 
 // currentSpeed is maintained in the upper byte of currentSpeed
 struct CAR {
