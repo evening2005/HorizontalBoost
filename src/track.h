@@ -22,10 +22,10 @@
 
 
 // GBitmap *finishLine;
-void load_finish_line_bitmap();
+// void load_finish_line_bitmap();
 //void draw_track(GContext *ctx, int playerPosition);
 //void draw_finish_line(GContext *ctx, int playerPosition);
-bool car_crossed_line(GRect carRect);
+// bool car_crossed_line(GRect carRect);
 // void set_up_distance_markers();
 
 

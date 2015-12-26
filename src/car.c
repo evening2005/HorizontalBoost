@@ -1,6 +1,6 @@
 #include "pge.h"
 #include "car.h"
-#include "track.h"
+#include "trackHB.h"
 #include "pge_collision.h"
 #include "statemachine.h"
 
@@ -73,37 +73,6 @@ void update_position_ui() {
 
 
 
-static GRect boostUIOuter = { {38, 2}, {66, 11} };
-static GRect boostUIInner = { {39, 3}, {64,  9} };
-
-void update_boost_ui(GContext *ctx) {
-    // The boost ui is just a rectangle reflecting how boost times
-    graphics_context_set_fill_color(ctx, GColorWhite);
-    graphics_draw_rect(ctx, boostUIOuter);
-    if(playerCar->finished) return;
-    
-    if(playerCar->boosting) {
-        // The whole bar is green. The length reflects the proportion
-        //  of the boostDurationMillis that remains
-        int boostRemaining = playerCar->boostDurationMillis - (get_milli_time() - playerCar->boostStartMillis);
-        if(boostRemaining < 0) boostRemaining = 0;
-        int16_t barLength = (boostRemaining * 64) / playerCar->maxBoostDurationMillis;
-        boostUIInner.size.w = barLength;
-        graphics_context_set_fill_color(ctx, GColorOxfordBlue);    
-        graphics_fill_rect(ctx, boostUIInner, 0, 0);
-    } else {
-        int sinceLastBoost = min((get_milli_time() - playerCar->lastBoostMillis), BOOST_COOLDOWN_MILLIS);
-        uint32_t barLength = (sinceLastBoost * 64) / BOOST_COOLDOWN_MILLIS;
-        if((sinceLastBoost < BOOST_MINIMUM_COOLDOWN) || (playerCar->rank == 0)) graphics_context_set_fill_color(ctx, GColorSunsetOrange);
-        else graphics_context_set_fill_color(ctx, GColorOxfordBlue);
-        boostUIInner.size.w = (int16_t)barLength;
-        graphics_fill_rect(ctx, boostUIInner, 0, 0);
-    }
-}
-
-
-
-
 
 
 
@@ -124,6 +93,10 @@ void show_results(void *data) {
 
 
 */
+
+
+
+
 
 
 void delete_cars() {
@@ -148,7 +121,7 @@ void set_camera_focus() {
     if(playerCar->finished == 0) {
         cameraFocus = playerCar->worldPosition.x;    
     } else {
-        cameraFocus = TRACK_FINISH_LINE - 50;
+        cameraFocus = TRACK_FINISH_LINE;
     }
 }
 
@@ -272,6 +245,36 @@ uint32_t calculate_drag(carType *carPtr) {
 }
 
 
+static GRect boostUIOuter = { {18, 150}, {66, 9} };
+static GRect boostUIInner = { {19, 151}, {64, 7} };
+
+void update_boost_ui(GContext *ctx) {
+    // The boost ui is just a rectangle reflecting how boost times
+    graphics_context_set_fill_color(ctx, GColorWhite);
+    graphics_draw_rect(ctx, boostUIOuter);
+    if(playerCar->finished) return;
+    
+    if(playerCar->boosting) {
+        // The whole bar is green. The length reflects the proportion
+        //  of the boostDurationMillis that remains
+        int boostRemaining = playerCar->boostDurationMillis - (get_milli_time() - playerCar->boostStartMillis);
+        if(boostRemaining < 0) boostRemaining = 0;
+        int16_t barLength = (boostRemaining * 64) / playerCar->maxBoostDurationMillis;
+        boostUIInner.size.w = barLength;
+        graphics_context_set_fill_color(ctx, GColorMintGreen );    
+        graphics_fill_rect(ctx, boostUIInner, 0, 0);
+    } else {
+        int sinceLastBoost = min((get_milli_time() - playerCar->lastBoostMillis), BOOST_COOLDOWN_MILLIS);
+        uint32_t barLength = (sinceLastBoost * 64) / BOOST_COOLDOWN_MILLIS;
+        if((sinceLastBoost < BOOST_MINIMUM_COOLDOWN)) graphics_context_set_fill_color(ctx, GColorDarkCandyAppleRed);
+        else graphics_context_set_fill_color(ctx, GColorMintGreen );
+        boostUIInner.size.w = (int16_t)barLength;
+        graphics_fill_rect(ctx, boostUIInner, 0, 0);
+    }
+}
+
+
+
 
 void car_movement(carType *carPtr) {
     if(carPtr->worldPosition.x > TRACK_FINISH_LINE + 250) {
@@ -314,7 +317,7 @@ void car_movement(carType *carPtr) {
 
 
 #define BOOST_RANKS (10)
-static uint32_t permittedBoostTimes[BOOST_RANKS] = {0, 1250, 2000, 3000, 4000, 4500, 4750, 5000, 5250, 5500};
+static uint32_t permittedBoostTimes[BOOST_RANKS] = {250, 1250, 2000, 3000, 4000, 4500, 4750, 5000, 5250, 5500};
 
 int get_permitted_boost_time(carType *carPtr) {
     uint32_t r = carPtr->rank;
@@ -324,8 +327,6 @@ int get_permitted_boost_time(carType *carPtr) {
 }
 
 void switch_on_boost(carType *carPtr) {
-    // We can't boost if we're in the lead..
-    if(carPtr->rank == 0) return;
     // We can't boost if we are currently boosting!
     if(carPtr->boosting) return;
     // How long since we last boosted?
@@ -417,14 +418,14 @@ void ai_steering(carType *carPtr) {
             if(abs(diffFront) <= (CAR_WIDTH+1)) {
                 if(diffFront < 0) {
                     // Car in front is to our left, so steer right (but not if too close to barrier)
-                    if(carInFront->sprite->position.y >= (TRACK_CENTRE_LINE + (CAR_WIDTH/2))) {
+                    if(carInFront->sprite->position.y >= (TRACK_CENTRE_LINE - CAR_WIDTH - CAR_WIDTH)) {
                         carPtr->worldPosition.y = car_steer(carPtr, -STEER_AMOUNT);
                     } else {
                         carPtr->worldPosition.y = car_steer(carPtr, +STEER_AMOUNT);
                     }
                 } else if(diffFront > 0) {
                     // Car in front is to our right, so steer left (but not if too close to barrier)
-                    if(carInFront->sprite->position.y <= (TRACK_CENTRE_LINE + (CAR_WIDTH/2))) {
+                    if(carInFront->sprite->position.y <= (TRACK_CENTRE_LINE + CAR_WIDTH + CAR_WIDTH + CAR_WIDTH)) {
                         carPtr->worldPosition.y = car_steer(carPtr, +STEER_AMOUNT);
                     } else {
                         carPtr->worldPosition.y = car_steer(carPtr, -STEER_AMOUNT);
@@ -521,9 +522,9 @@ void car_frame_update() {
 
 
 
-#define PLAYERFIRSTSCREENX (90)
-#define PLAYERLASTSCREENX (12)
-#define PLAYERMIDSCREENX (56)
+#define PLAYERFIRSTSCREENX (80)
+#define PLAYERLASTSCREENX (6)
+#define PLAYERMIDSCREENX (50)
 static int playerScreenPosX = PLAYERMIDSCREENX;
 
 

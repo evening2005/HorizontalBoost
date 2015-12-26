@@ -4,7 +4,7 @@
         ""
     ],
     "companyName": "andyw2004@gmail.com",
-    "longName": "game01",
+    "longName": "Boost Racing (Horizontal) 01",
     "projectType": "native",
     "resources": {
         "media": [
@@ -142,7 +142,7 @@
         ]
     },
     "sdkVersion": "3",
-    "shortName": "game01",
+    "shortName": "BoostRacingH01",
     "targetPlatforms": [
         "basalt"
     ],

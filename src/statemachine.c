@@ -2,7 +2,7 @@
 #include "statemachine.h"
 
 
-static STATES currentState = STATE_BEFORERACE;
+static STATES currentState = STATE_SPLASH;
 
 STATES get_current_state() {
     return currentState;

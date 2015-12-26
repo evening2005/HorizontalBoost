@@ -62,10 +62,10 @@ GPoint get_starting_position(uint32_t num);
 void delete_cars();
 void car_add_to_grid(carType *carPtr);
 void set_race_start_time();
+void update_boost_ui(GContext *ctx);
 
 /*
 
-void update_boost_ui(GContext *ctx);
 void set_up_steering_guide();
 
 void make_pos_gap_ui(Window *window);
