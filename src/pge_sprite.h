@@ -59,3 +59,13 @@ bool pge_check_collision(PGESprite* sprite1, PGESprite *sprite2);
  * Get the on-screen bounds of the PGESprite
  */
 GRect pge_sprite_get_bounds(PGESprite *this);
+
+/**
+ * ADDED BY AW
+ * get the bitmap for the PGESprite
+ */
+GBitmap *pge_sprite_get_bitmap(PGESprite *this);
+
+
+
+

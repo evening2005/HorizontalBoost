@@ -14,17 +14,6 @@ static uint64_t raceStartTime = 0;
 
 /*
 
-// rank is numbered from 0
-carType *get_finisher(int rank) {
-    if(rank < 0) rank = 0;
-    if(rank > MAX_NPCS) rank = MAX_NPCS;
-    return finishingOrder[rank];
-}
-
-
-
-
-
 TextLayer *positionAndGap = NULL;
 
 void make_pos_gap_ui(Window *window) {
@@ -79,23 +68,16 @@ void update_position_ui() {
 
 
 
-static AppTimer *endOfRaceTimer;
-
-void show_results(void *data) {
-    // Switching to this state will cause the results to appear
-    layer_set_hidden((Layer *)positionAndGap, true);
-    set_current_state(STATE_AFTERRACE);
-}
-
-
-
-
-
-
 */
 
 
 
+// rank is numbered from 0
+carType *get_finisher(int rank) {
+    if(rank < 0) rank = 0;
+    if(rank > MAX_NPCS) rank = MAX_NPCS;
+    return finishingOrder[rank];
+}
 
 
 
@@ -245,8 +227,8 @@ uint32_t calculate_drag(carType *carPtr) {
 }
 
 
-static GRect boostUIOuter = { {18, 150}, {66, 9} };
-static GRect boostUIInner = { {19, 151}, {64, 7} };
+static GRect boostUIOuter = { {1, 52}, {12, 66} };
+static GRect boostUIInner = { {2, 53}, {10, 64} };
 
 void update_boost_ui(GContext *ctx) {
     // The boost ui is just a rectangle reflecting how boost times
@@ -259,16 +241,18 @@ void update_boost_ui(GContext *ctx) {
         //  of the boostDurationMillis that remains
         int boostRemaining = playerCar->boostDurationMillis - (get_milli_time() - playerCar->boostStartMillis);
         if(boostRemaining < 0) boostRemaining = 0;
-        int16_t barLength = (boostRemaining * 64) / playerCar->maxBoostDurationMillis;
-        boostUIInner.size.w = barLength;
-        graphics_context_set_fill_color(ctx, GColorMintGreen );    
+        int16_t barHeight = ((boostRemaining * 64) / playerCar->maxBoostDurationMillis);
+        boostUIInner.size.h = barHeight;
+        boostUIInner.origin.y = 117 - barHeight;
+        graphics_context_set_fill_color(ctx, GColorSpringBud);    
         graphics_fill_rect(ctx, boostUIInner, 0, 0);
     } else {
         int sinceLastBoost = min((get_milli_time() - playerCar->lastBoostMillis), BOOST_COOLDOWN_MILLIS);
-        uint32_t barLength = (sinceLastBoost * 64) / BOOST_COOLDOWN_MILLIS;
-        if((sinceLastBoost < BOOST_MINIMUM_COOLDOWN)) graphics_context_set_fill_color(ctx, GColorDarkCandyAppleRed);
-        else graphics_context_set_fill_color(ctx, GColorMintGreen );
-        boostUIInner.size.w = (int16_t)barLength;
+        uint16_t barHeight = (sinceLastBoost * 64) / BOOST_COOLDOWN_MILLIS;
+        if((sinceLastBoost < BOOST_MINIMUM_COOLDOWN)) graphics_context_set_fill_color(ctx, GColorBulgarianRose);
+        else graphics_context_set_fill_color(ctx, GColorSpringBud);
+        boostUIInner.size.h = barHeight;
+        boostUIInner.origin.y = 117 - barHeight;
         graphics_fill_rect(ctx, boostUIInner, 0, 0);
     }
 }
@@ -477,6 +461,14 @@ void check_for_finisher(carType *carPtr) {
 }
 
 
+static AppTimer *endOfRaceTimer;
+
+void show_results(void *data) {
+    // Switching to this state will cause the results to appear
+    // layer_set_hidden((Layer *)positionAndGap, true);
+    set_current_state(STATE_AFTERRACE);
+}
+
 bool all_cars_finished() {
     int c;
     for(c=0; c < MAX_NPCS; c++) {
@@ -516,7 +508,7 @@ void car_frame_update() {
     }
     if(all_cars_finished()) {
         // Switch to the results screen after a short delay
-        // endOfRaceTimer = app_timer_register(2000, (AppTimerCallback)show_results, NULL);
+        endOfRaceTimer = app_timer_register(2000, (AppTimerCallback)show_results, NULL);
     }
 }
 

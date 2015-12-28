@@ -63,6 +63,10 @@ void delete_cars();
 void car_add_to_grid(carType *carPtr);
 void set_race_start_time();
 void update_boost_ui(GContext *ctx);
+uint64_t get_milli_time();
+// This is called from raceresult.c
+carType *get_finisher(int rank);
+
 
 /*
 
@@ -70,7 +74,5 @@ void set_up_steering_guide();
 
 void make_pos_gap_ui(Window *window);
 void destroy_pos_gap_ui();
-// This is called from raceresult.c
-carType *get_finisher(int rank);
 
 */

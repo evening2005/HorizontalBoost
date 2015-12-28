@@ -54,7 +54,7 @@ static GFont distFont;
 
 void set_up_distance_markers() {
     distFont = fonts_get_system_font(FONT_KEY_LECO_36_BOLD_NUMBERS);
-    GRect dist = { {8, 64}, {128, 80} };
+    GRect dist = { {8, 64}, {140, 80} };
     
     for(int i=0; i < 33; i++) {
         dist.origin.x = i*100;
@@ -72,7 +72,7 @@ void draw_remaining_distance(GContext *ctx, int cameraFocus) {
     GRect distanceRect;
     howFarToGo = (howFarToGo / 100);
     int m;
-    graphics_context_set_text_color(ctx, GColorSpringBud);
+    graphics_context_set_text_color(ctx, GColorBlack);
     for(m=(howFarToGo-1); m <= (howFarToGo+1); m++) {
         diff = (m * 1000) - (TRACK_FINISH_LINE - cameraFocus);
         distanceRect = distanceMarkers[m];

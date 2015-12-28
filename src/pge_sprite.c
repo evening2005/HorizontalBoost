@@ -77,3 +77,10 @@ GRect pge_sprite_get_bounds(PGESprite *this) {
   return GRect(this->position.x, this->position.y, bounds.size.w, bounds.size.h);
 }
 
+GBitmap *pge_sprite_get_bitmap(PGESprite *this) {
+    return this->bitmap;
+}
+
+
+
+

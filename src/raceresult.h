@@ -1,9 +1,10 @@
 #pragma once
 #include "pebble.h"
 
-#define RESULTS_TOP (32)
-#define RESULTS_LEFT (24)
+#define RESULTS_TOP (50)
+#define RESULTS_LEFT (8)
 #define RESULTS_GAP  (2)
+#define RESULTS_CAR_LEFT (108)
 
 void race_result_create_position_layers();
 void race_result_destroy_assets();

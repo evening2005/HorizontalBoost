@@ -9,6 +9,7 @@
 #include "car.h"
 #include "statemachine.h"
 #include "gamelight.h"
+#include "raceresult.h"
 
 static Window *gameWindow;
 carType blueCar;
@@ -24,8 +25,8 @@ carType greenTruck;
 
 static void game_logic() {
     // Per-frame game logic here
-
     if(get_current_state() == STATE_BEFORERACE) {
+        race_result_create_position_layers();
         place_cars_on_grid();
         set_race_start_time();
         switch_on_light();
@@ -48,6 +49,7 @@ static void game_draw(GContext *ctx) {
         update_boost_ui(ctx);
     } else if(get_current_state() == STATE_AFTERRACE) {
         // This actually only gets done once
+        race_result_populate_position_layers(ctx);
     }
 
 }
@@ -55,16 +57,18 @@ static void game_draw(GContext *ctx) {
 static void game_click(int buttonID, bool longClick) {
     if(buttonID == BUTTON_ID_SELECT) {
         if(get_current_state() == STATE_AFTERRACE) {
+            race_result_destroy_assets();
             set_current_state(STATE_BEFORERACE);
         }
     }
 }
 
-
-
 void pge_init() {
-    srand(time(NULL));
+    //srand(get_milli_time());
     load_kerb_bitmaps();
+    // Load the results backdrop
+    load_result_backdrop_and_font();
+    
     // Load the finishing line bitmap
     load_finish_line_bitmap();
     set_up_distance_markers();
@@ -92,14 +96,14 @@ void pge_init() {
 }
 
 void pge_deinit() {
-
     // Finish the game
+    destroy_result_backdrop_and_font();
+    race_result_destroy_assets();
+    race_result_destroy_animations();
     delete_cars();
     destroy_kerb_bitmaps();
     destroy_finish_line_bitmap();
     light_off(NULL);
-   
     pge_finish();
-
 }
 

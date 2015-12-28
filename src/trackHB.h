@@ -3,7 +3,7 @@
 
 
 #define TRACK_START_LINE (76)
-#define TRACK_FINISH_LINE (15000)
+#define TRACK_FINISH_LINE (5000)
 
 #define BARRIER_LEFT (0)
 #define BARRIER_WIDTH (8)
