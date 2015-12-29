@@ -30,7 +30,7 @@ void make_dashboard_clock(Window *window) {
 
 void update_dashboard_clock(struct tm *timeStruct, TimeUnits unitsChanged) {
     STATES cs = get_current_state();
-    if(cs == STATE_RACING || cs == STATE_AFTERRACE) {
+    if(cs == STATE_RACING || cs == STATE_RESULTS || cs == STATE_AFTERRESULTS) {
         //Write the time to the buffer in a safe manner
         strftime(dashClockBuffer, sizeof("00:00"), "%H:%M", timeStruct);
         layer_set_hidden((Layer *)dashboardClock, false);

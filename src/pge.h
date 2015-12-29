@@ -56,9 +56,12 @@ void pge_finish();
 bool pge_get_button_state(ButtonId button);
 
 /**
- * Set the desired framerate (0 - 30)
+ * Set (& get - AW) the desired framerate (0 - 30)
  */
 void pge_set_framerate(int new_rate);
+
+// ADDED BY AW
+int pge_get_average_framerate();
 
 /**
  * Set the fullscreen background image

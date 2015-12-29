@@ -4,37 +4,31 @@
 #include "car.h"
 #include "trackHB.h"
 #include "pge_sprite.h"
+#include "statemachine.h"
 
 #define PODIUM_POSITIONS (4)
 
-static GBitmap *resultBackdropBitmap;
-BitmapLayer *resultBackdropLayer;
 static GFont customFont;
 static GFont titleFont;
+static char *titleText = "RESULTS";
+static GRect titleRect = { {0, 0}, {144, 40}};
+static TextLayer *resultsTitleLayer;
 
-
-void load_result_backdrop_and_font() {
-    GRect resultBackdropRect = { {10,20}, {128,128} };
-    resultBackdropLayer = bitmap_layer_create(resultBackdropRect);
-    resultBackdropBitmap = gbitmap_create_with_resource(RESOURCE_ID_GOLD_BACKGROUND);
-
-    bitmap_layer_set_bitmap(resultBackdropLayer, resultBackdropBitmap);
+void load_results_title_fonts() {
     customFont = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_PRAGATTINARROW_BOLD_18));
-    titleFont = fonts_get_system_font(FONT_KEY_BITHAM_30_BLACK );
+    titleFont = fonts_get_system_font(FONT_KEY_BITHAM_30_BLACK);
 
+    resultsTitleLayer = text_layer_create(titleRect);
+    text_layer_set_font(resultsTitleLayer, titleFont);
+    text_layer_set_text_alignment(resultsTitleLayer, GTextAlignmentCenter);
+    text_layer_set_text(resultsTitleLayer, titleText);    
 }
 
-void destroy_result_backdrop_and_font() {
+void destroy_results_title_fonts() {
     fonts_unload_custom_font(customFont);
-    layer_remove_from_parent((Layer *)resultBackdropLayer);
-    bitmap_layer_destroy(resultBackdropLayer);
-    gbitmap_destroy(resultBackdropBitmap);  
-}
 
-void draw_result_backdrop(GContext *ctx) {
-    Window *gameWindow = pge_get_window();
-    Layer *windowLayer = window_get_root_layer(gameWindow);
-    layer_add_child(windowLayer, (Layer *)resultBackdropLayer);
+    layer_remove_from_parent((Layer *)resultsTitleLayer);
+    text_layer_destroy(resultsTitleLayer);
 }
 
 
@@ -76,21 +70,29 @@ void race_result_create_position_layers() {
 
 
 
+
 static bool alreadyPopulated = false;
 
 // Two animations per rank: (1) Car bitmap; (2) Text
 static PropertyAnimation *resultAnimations[PODIUM_POSITIONS*2];
 static Animation *animationSequence;
-static char *titleText = "RESULTS";
-static GRect titleRect = { {0, 0}, {144, 48}};
+
+void animation_started(Animation *animation, void *data) {
+    // Animation started!
+    // Do nothing actually
+}
+
+void animation_stopped(Animation *animation, bool finished, void *data) {
+    // Animation stopped!
+    set_current_state(STATE_AFTERRESULTS);
+}
 
 void race_result_populate_position_layers(GContext *ctx) {
-    graphics_draw_text(ctx, titleText, titleFont, titleRect, GTextOverflowModeWordWrap, GTextAlignmentCenter, NULL);
     if(alreadyPopulated == false) {
-
         // draw_result_backdrop(ctx);
         Window *gameWindow = pge_get_window();
         Layer *windowLayer = window_get_root_layer(gameWindow);
+        layer_add_child(windowLayer, (Layer *)resultsTitleLayer);
         int rank;
         uint32_t animationNumber = 0;
         for(rank = 0; rank < PODIUM_POSITIONS; rank++) {
@@ -120,6 +122,11 @@ void race_result_populate_position_layers(GContext *ctx) {
             animationNumber += 2;
         }
         animationSequence = animation_sequence_create_from_array((Animation **)resultAnimations, PODIUM_POSITIONS*2);
+        // You may set handlers to listen for the start and stop events
+        AnimationHandlers ah;
+        ah.started = animation_started;
+        ah.stopped = animation_stopped;
+        animation_set_handlers((Animation*) animationSequence, ah, NULL);
         animation_schedule(animationSequence);
         alreadyPopulated = true;
     }
@@ -128,13 +135,13 @@ void race_result_populate_position_layers(GContext *ctx) {
 
 void race_result_destroy_assets() {
     int rank;
+    layer_remove_from_parent((Layer *)resultsTitleLayer);
     for(rank = 0; rank < PODIUM_POSITIONS; rank++) {
         layer_remove_from_parent((Layer *)positionLayers[rank]);
         text_layer_destroy(positionLayers[rank]);
         layer_remove_from_parent((Layer *)carPositionLayers[rank]);
         bitmap_layer_destroy(carPositionLayers[rank]);
     }
-    layer_remove_from_parent((Layer *)resultBackdropLayer);
     alreadyPopulated = false;
 }
 

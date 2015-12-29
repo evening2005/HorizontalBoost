@@ -191,11 +191,21 @@ void sort_cars_by_finishing_time() {
 void draw_cars(GContext *ctx) {
     int c;
     carType *carPtr;
-
+    static uint8_t rgbRed = 0;
+    
     //draw_finish_line(ctx, cameraFocus);
     for(c=0; c <= howManyNPCs; c++) {
         carPtr = startingGrid[c];
         pge_sprite_draw(carPtr->sprite, ctx);
+        if(carPtr == playerCar) {
+            GRect temp;
+            temp.origin = carPtr->sprite->position;
+            temp.size = GSize(CAR_LENGTH, CAR_WIDTH);
+            GRect outlineRect = grect_crop(temp, -2); 
+            graphics_context_set_stroke_color(ctx, GColorFromRGB(rgbRed, 255, 255));
+            rgbRed += 11;
+            graphics_draw_round_rect(ctx, outlineRect, 0);
+        }
     }
 }
 
@@ -232,7 +242,7 @@ static GRect boostUIInner = { {2, 53}, {10, 64} };
 
 void update_boost_ui(GContext *ctx) {
     // The boost ui is just a rectangle reflecting how boost times
-    graphics_context_set_fill_color(ctx, GColorWhite);
+    graphics_context_set_stroke_color(ctx, GColorWhite);
     graphics_draw_rect(ctx, boostUIOuter);
     if(playerCar->finished) return;
     
@@ -301,7 +311,7 @@ void car_movement(carType *carPtr) {
 
 
 #define BOOST_RANKS (10)
-static uint32_t permittedBoostTimes[BOOST_RANKS] = {250, 1250, 2000, 3000, 4000, 4500, 4750, 5000, 5250, 5500};
+static uint32_t permittedBoostTimes[BOOST_RANKS] = {400, 1250, 2000, 3000, 4000, 4500, 4750, 5000, 5250, 5500};
 
 int get_permitted_boost_time(carType *carPtr) {
     uint32_t r = carPtr->rank;
@@ -466,7 +476,7 @@ static AppTimer *endOfRaceTimer;
 void show_results(void *data) {
     // Switching to this state will cause the results to appear
     // layer_set_hidden((Layer *)positionAndGap, true);
-    set_current_state(STATE_AFTERRACE);
+    set_current_state(STATE_RESULTS);
 }
 
 bool all_cars_finished() {
@@ -520,43 +530,6 @@ void car_frame_update() {
 static int playerScreenPosX = PLAYERMIDSCREENX;
 
 
-#define YPOS0 (-72+IBL+INTER_GRID_GAP+INTER_GRID_GAP)
-#define YPOS1 (YPOS0 + CAR_WIDTH + INTER_GRID_GAP)
-#define YPOS2 (YPOS1 + CAR_WIDTH + INTER_GRID_GAP)
-#define YPOS3 (YPOS2 + CAR_WIDTH + INTER_GRID_GAP)
-#define YPOS4 (YPOS3 + CAR_WIDTH + INTER_GRID_GAP)
-
-#define XPOS0 (0)
-#define XPOS1 (CAR_LENGTH - INTER_GRID_GAP - INTER_GRID_GAP)
-
-
-static GPoint startingPositions[GRID_WIDTH * GRID_DEPTH] = { {XPOS0,YPOS0}, {XPOS0,YPOS1}, {XPOS0,YPOS2}, {XPOS0,YPOS3}, {XPOS0,YPOS4},
-                                                             {XPOS1,YPOS0}, {XPOS1,YPOS1}, {XPOS1,YPOS2}, {XPOS1,YPOS3}, {XPOS1,YPOS4} };
-
-// Shuffle the starting positions
-void shuffle_starting_positions() {
-    int temp;
-    for(int i=0; i < 50; i++) {
-        // Pick two at random and swap them
-        uint32_t r1 = rand() % (GRID_WIDTH * GRID_DEPTH);
-        uint32_t r2 = rand() % (GRID_WIDTH * GRID_DEPTH);
-        temp = startingPositions[r1].x;
-        startingPositions[r1].x = startingPositions[r2].x;
-        startingPositions[r2].x = temp;
-    }
-}
-
-
-void set_up_starting_positions() {
-    playerScreenPosX = PLAYERMIDSCREENX;
-    shuffle_starting_positions();
-}
-
-GPoint get_starting_position(uint32_t num) {
-    return startingPositions[num];
-} 
-
-
 
 // This is done at the start of each race
 void reset_car(carType *carPtr) {
@@ -576,14 +549,18 @@ void reset_car(carType *carPtr) {
 // This is used to position the cars on the grid
 // It can only be called after the startingGrid has been filled!
 void place_cars_on_grid() {
-    // This sets up the positions of the grid on the track
-    set_up_starting_positions();
+    playerScreenPosX = PLAYERMIDSCREENX;
+    GRect gridRect;
+    // This sets up the positions of the grid on the track (trackHB)
+    set_up_grid_positions();
+    shuffle_grid_positions(howManyNPCs);
     playerCar->finished = 0;
     set_camera_focus();
     // Now go through each car and find its position on the starting line
     for(uint32_t c=0; c <= howManyNPCs; c++) {
         reset_car(startingGrid[c]);
-        startingGrid[c]->startingPosition = get_starting_position(c);
+        gridRect = get_grid_position(c);
+        startingGrid[c]->startingPosition = gridRect.origin;
         startingGrid[c]->worldPosition = startingGrid[c]->startingPosition;
         APP_LOG(APP_LOG_LEVEL_DEBUG, "starting positions: %d : %d", startingGrid[c]->worldPosition.x, startingGrid[c]->worldPosition.y);
     }

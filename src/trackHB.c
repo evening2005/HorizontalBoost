@@ -4,6 +4,57 @@
 #include "pge_collision.h"
 
 
+
+#define FRONTX (-20)
+#define SECONDX (-60)
+#define THIRDX (-100)
+#define OUTL (-64)
+#define INL  (-32)
+#define MID  (0)
+#define OUTR (64)
+#define INR  (32)
+
+void set_up_grid_positions() {
+    gridPositions[0] = GRect(FRONTX,  MID, 32, 20);
+    gridPositions[1] = GRect(FRONTX,  INL, 32, 20);
+    gridPositions[2] = GRect(FRONTX,  INR, 32, 20);
+    gridPositions[3] = GRect(FRONTX, OUTL, 32, 20);
+    gridPositions[4] = GRect(FRONTX, OUTR, 32, 20);
+
+    gridPositions[5] = GRect(SECONDX,  MID, 32, 20);
+    gridPositions[6] = GRect(SECONDX,  INL, 32, 20);
+    gridPositions[7] = GRect(SECONDX,  INR, 32, 20);
+    gridPositions[8] = GRect(SECONDX, OUTL, 32, 20);
+    gridPositions[9] = GRect(SECONDX, OUTR, 32, 20);
+
+    gridPositions[10] = GRect(THIRDX,  MID, 32, 20);
+    gridPositions[11] = GRect(THIRDX,  INL, 32, 20);
+    gridPositions[12] = GRect(THIRDX,  INR, 32, 20);
+    gridPositions[13] = GRect(THIRDX, OUTL, 32, 20);
+    gridPositions[14] = GRect(THIRDX, OUTR, 32, 20);
+}
+
+
+// howMany is how many NPCs there are in the race; 
+//  we have to add 1 (inside the loop) to account for the playerCar
+void shuffle_grid_positions(int howMany) {
+    uint32_t i;
+    uint32_t r1, r2;
+    GRect temp;
+    for(i = 0; i < 50; i++) {
+        r1 = rand() % (howMany+1);
+        r2 = rand() % (howMany+1);
+        temp = gridPositions[r1];
+        gridPositions[r1] = gridPositions[r2];
+        gridPositions[r2] = temp;
+    }
+}
+
+GRect get_grid_position(int whichOne) {
+    return gridPositions[whichOne];
+}
+
+
 static GBitmap *kerbLeft;
 static GBitmap *kerbRight;
 static GBitmap *finishLine;
@@ -32,11 +83,12 @@ void destroy_finish_line_bitmap() {
 static GRect finishLineRect;
 void draw_finish_line(GContext *ctx, int cameraFocus) {
     int diff = cameraFocus - TRACK_FINISH_LINE;
+    if(abs(diff) > 500) return; 
     finishLineRect.origin.x = (TRACK_START_LINE - diff - 80);
     finishLineRect.origin.y = 0;
     finishLineRect.size.w = 150;
     finishLineRect.size.h = 168;
-    if(abs(diff) <= 500) graphics_draw_bitmap_in_rect(ctx, finishLine, finishLineRect);
+    graphics_draw_bitmap_in_rect(ctx, finishLine, finishLineRect);
 }
 
 
