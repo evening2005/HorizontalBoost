@@ -83,12 +83,11 @@ void destroy_finish_line_bitmap() {
 static GRect finishLineRect;
 void draw_finish_line(GContext *ctx, int cameraFocus) {
     int diff = cameraFocus - TRACK_FINISH_LINE;
-    if(abs(diff) > 500) return; 
     finishLineRect.origin.x = (TRACK_START_LINE - diff - 80);
     finishLineRect.origin.y = 0;
     finishLineRect.size.w = 150;
     finishLineRect.size.h = 168;
-    graphics_draw_bitmap_in_rect(ctx, finishLine, finishLineRect);
+    if(abs(diff) <= 500) graphics_draw_bitmap_in_rect(ctx, finishLine, finishLineRect);
 }
 
 

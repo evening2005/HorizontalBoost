@@ -466,7 +466,7 @@ void check_for_finisher(carType *carPtr) {
         if(carPtr->finished != 0) return;
         int ft = get_milli_time() - raceStartTime;
         carPtr->finished = ft;
-        APP_LOG(APP_LOG_LEVEL_DEBUG, "FINISHED: %d : %d - SPEED: %d - POSITION: %d", carPtr->carNumber, ft, carPtr->currentSpeed >> 8, carPtr->worldPosition.y);
+        APP_LOG(APP_LOG_LEVEL_DEBUG, "FINISHED: %d : %d - SPEED: %d - POSITION: %d", carPtr->carNumber, ft, (int)carPtr->currentSpeed >> 8, carPtr->worldPosition.y);
    }
 }
 

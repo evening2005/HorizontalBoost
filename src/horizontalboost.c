@@ -27,7 +27,7 @@ static void game_logic() {
     // Per-frame game logic here
     if(get_current_state() == STATE_BEFORERACE) {
         race_result_create_position_layers();
-       // place_cars_on_grid() is in car.h
+        // place_cars_on_grid() is in car.h
         place_cars_on_grid();
         set_race_start_time();
         switch_on_light();
