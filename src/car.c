@@ -188,7 +188,7 @@ void draw_cars(GContext *ctx) {
             GRect temp;
             temp.origin = carPtr->sprite->position;
             temp.size = GSize(CAR_LENGTH, CAR_WIDTH);
-            GRect outlineRect = grect_crop(temp, -2); 
+            GRect outlineRect = grect_crop(temp, -1); 
             graphics_context_set_stroke_color(ctx, GColorFromRGB(255, 255, 0));
             graphics_draw_rect(ctx, outlineRect);
         }
@@ -407,7 +407,7 @@ void ai_create_steering_plan(carType *carPtr) {
                     if(diffFront < 0) {
                         // Car in front is to our left, so steer right (but not if too close to barrier)
                         int newY = carInFront->worldPosition.y + (CAR_WIDTH + PASSING_CLEARANCE);
-                        if(newY < (168 - BARRIER_WIDTH - PASSING_CLEARANCE)) {
+                        if(newY < (168 - BARRIER_WIDTH - PASSING_CLEARANCE - CAR_WIDTH)) {
                             carPtr->steeringPlan = newY;
                         } else {
                             carPtr->steeringPlan = carInFront->worldPosition.y - (CAR_WIDTH + PASSING_CLEARANCE);
@@ -560,7 +560,7 @@ void car_frame_update() {
 
 #define PLAYERFIRSTSCREENX (80)
 #define PLAYERLASTSCREENX (6)
-#define PLAYERMIDSCREENX (50)
+#define PLAYERMIDSCREENX (60)
 static int playerScreenPosX = PLAYERMIDSCREENX;
 
 
@@ -628,7 +628,7 @@ int player_screen_position() {
             } else if(playerScreenPosX < PLAYERFIRSTSCREENX) {
                 playerScreenPosX += 1;
             }
-        } else if(playerCar->rank == howManyNPCs) { // Oh dear! Player is last
+        } else if(playerCar->rank > (howManyNPCs / 2)) { // Oh dear! Player in back half
             if(playerScreenPosX < PLAYERLASTSCREENX) {
                 playerScreenPosX += 1;
             } else if(playerScreenPosX > PLAYERLASTSCREENX) {

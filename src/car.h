@@ -10,9 +10,9 @@
 #define BOOST_COOLDOWN_MILLIS (2048)
 #define BOOST_MINIMUM_COOLDOWN (BOOST_COOLDOWN_MILLIS >> 1)
 
-#define SPEED_INC (6)
+#define SPEED_INC (3)
 #define CRASH_SLOWDOWN (1)
-#define BOOST_INC (19)
+#define BOOST_INC (11)
 #define DRAG_DIVISOR (21)
 
 #define MAX_NPCS (8)
