@@ -56,18 +56,6 @@ void update_position_ui() {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 */
 
 
@@ -402,6 +390,83 @@ void car_handle_buttons(carType *carPtr) {
         }
     }
 }
+
+// This function develops a "plan" for steering. The idea is that we don't 
+//  try to decide what to do every frame, because this leads to "oscillating"
+//  back and forth in what the car is trying to do.
+// The "plan" is simply a target value for worldPosition.y - if we already have a "plan",
+//  we just continue to follow it until it becomes impossible, or until it is already
+//  achieved or until it is no longer required.
+void ai_create_steering_plan(carType *carPtr) {
+    if(carPtr->rank != 0) {
+        carType *carInFront = sortedGrid[carPtr->rank-1];
+        if((carInFront->worldPosition.x - carPtr->worldPosition.x) < (CAR_LENGTH*3)) {
+            // We have to worry about the car in front
+            // Check to see whether we already have a plan
+            int diffFront = (carInFront->sprite->position.y - carPtr->sprite->position.y);
+            if(abs(diffFront) <= (CAR_WIDTH+1)) {
+                if(carPtr->steeringPlan == NO_STEERING_PLAN) {
+                    if(diffFront < 0) {
+                        // Car in front is to our left, so steer right (but not if too close to barrier)
+                        int newY = carInFront->worldPosition.y + (CAR_WIDTH + PASSING_CLEARANCE);
+                        if(newY < (168 - BARRIER_WIDTH - PASSING_CLEARANCE)) {
+                            carPtr->steeringPlan = newY;
+                        } else {
+                            carPtr->steeringPlan = carInFront->worldPosition.y - (CAR_WIDTH + PASSING_CLEARANCE);
+                        }
+                    } else if(diffFront > 0) {
+                        // Car in front is to our right, so steer left (but not if too close to barrier)
+                        int newY = carInFront->worldPosition.y - (CAR_WIDTH + PASSING_CLEARANCE);
+                        if(newY > (0 + BARRIER_WIDTH + PASSING_CLEARANCE)) {
+                            carPtr->steeringPlan = newY;
+                        } else {
+                            carPtr->steeringPlan = carInFront->worldPosition.y + (CAR_WIDTH + PASSING_CLEARANCE);
+                        }
+                    } else {
+                        // We are directly behind, so head towards the centre
+                        if(carPtr->worldPosition.y + (CAR_WIDTH/2) <= TRACK_CENTRE_LINE) {
+                            carPtr->steeringPlan = carInFront->worldPosition.y + (CAR_WIDTH + PASSING_CLEARANCE);
+                        } else {
+                            carPtr->steeringPlan = carInFront->worldPosition.y - (CAR_WIDTH + PASSING_CLEARANCE);
+                        }
+                    }      
+                }
+            } else {
+                // This means the car in front is not actually in our way
+                carPtr->steeringPlan = NO_STEERING_PLAN;
+            }
+        } else { 
+            // This means the car in front is too far ahead to worry about
+            carPtr->steeringPlan = NO_STEERING_PLAN;
+        }
+    }
+}
+
+
+void ai_execute_steering_plan(carType *carPtr) {
+    if(carPtr->steeringPlan == NO_STEERING_PLAN) return;
+    if(carPtr->worldPosition.y < carPtr->steeringPlan) {
+        int newY = car_steer(carPtr, +STEER_AMOUNT);
+        if(newY == carPtr->worldPosition.y) {
+            // Something stopped us, so ditch the plan
+            carPtr->steeringPlan = NO_STEERING_PLAN;   
+        } else {
+            carPtr->worldPosition.y = newY;
+        }
+    } else if(carPtr->worldPosition.y > carPtr->steeringPlan) {
+        int newY = car_steer(carPtr, -STEER_AMOUNT);
+        if(newY == carPtr->worldPosition.y) {
+            // Something stopped us, so ditch the plan
+            carPtr->steeringPlan = NO_STEERING_PLAN;   
+        } else {
+            carPtr->worldPosition.y = newY;
+        }
+    } else {
+        // We have completed the plan
+        carPtr->steeringPlan = NO_STEERING_PLAN;
+    }
+}
+
 void ai_steering(carType *carPtr) {
     if(carPtr->rank != 0) {
         // Try to steer so we can overtake the car in front!
@@ -439,9 +504,12 @@ void ai_steering(carType *carPtr) {
 
 
 void car_handle_ai(carType *carPtr) {
+    // ai_steering(carPtr);
+    // Experimental (replacing the line above)
+    ai_create_steering_plan(carPtr);
+    ai_execute_steering_plan(carPtr);
     // This is only called if this is NOT the player car
     //  and only one in sixty-four times on average!!
-    ai_steering(carPtr);
     if((rand() & 3) == 0) switch_on_boost(carPtr);      
 }
 

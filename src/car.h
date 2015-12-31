@@ -2,7 +2,7 @@
 
 #include "pge_sprite.h"
 
-
+// STEER_AMOUNT must remain 1 for the AI steering to work properly
 #define STEER_AMOUNT (1)
 #define STEER_SLOWDOWN (0)
 #define REAR_END_PENALTY (1)
@@ -23,13 +23,9 @@
 #define CAR_LENGTH (30)
 #define CAR_WIDTH (17)
 
-// This must be set up specifically based on the width of the track and the 
-//  width of the cars..
-#define GRID_WIDTH  (5)
-#define GRID_DEPTH  (2)
-#define INTER_GRID_GAP (10)
+#define PASSING_CLEARANCE (2)
+#define NO_STEERING_PLAN    (-9999)
 
-// currentSpeed is maintained in the upper byte of currentSpeed
 struct CAR {
     uint8_t carNumber;
     PGESprite *sprite;
@@ -37,8 +33,9 @@ struct CAR {
     GPoint worldPosition;
     uint32_t rank;
     bool boosting;
-    uint16_t currentSpeed;
+    uint16_t currentSpeed; 
     uint64_t finished;
+    int steeringPlan; // This is a target for worldPosition.y
     time_t boostStartMillis;
     time_t boostDurationMillis;
     time_t maxBoostDurationMillis;
