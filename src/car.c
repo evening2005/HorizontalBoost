@@ -560,7 +560,7 @@ void car_frame_update() {
 
 #define PLAYERFIRSTSCREENX (80)
 #define PLAYERLASTSCREENX (6)
-#define PLAYERMIDSCREENX (60)
+#define PLAYERMIDSCREENX (40)
 static int playerScreenPosX = PLAYERMIDSCREENX;
 
 
@@ -618,7 +618,7 @@ int player_screen_position() {
     static uint32_t counter = 0; // used to slow down transition in screenPosY
     counter++;
     
-    if((counter & 3) == 0) {
+    if((counter & 15) == 0) {
         if((get_milli_time() - raceStartTime) < 2200) {
             return PLAYERMIDSCREENX;
         }
