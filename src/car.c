@@ -603,6 +603,7 @@ static int playerScreenPosX = PLAYERMIDSCREENX;
 void reset_car(carType *carPtr) {
     carPtr->worldPosition = carPtr->startingPosition;
     carPtr->boosting = false;
+    carPtr->steeringPlan = NO_STEERING_PLAN;
     carPtr->boostStartMillis = get_milli_time();
     carPtr->lastBoostMillis = get_milli_time();
     carPtr->boostDurationMillis = 0;
