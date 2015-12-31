@@ -179,7 +179,6 @@ void sort_cars_by_finishing_time() {
 void draw_cars(GContext *ctx) {
     int c;
     carType *carPtr;
-    static uint8_t rgbRed = 0;
     
     //draw_finish_line(ctx, cameraFocus);
     for(c=0; c <= howManyNPCs; c++) {
@@ -190,9 +189,8 @@ void draw_cars(GContext *ctx) {
             temp.origin = carPtr->sprite->position;
             temp.size = GSize(CAR_LENGTH, CAR_WIDTH);
             GRect outlineRect = grect_crop(temp, -2); 
-            graphics_context_set_stroke_color(ctx, GColorFromRGB(rgbRed, 255, 255));
-            rgbRed += 11;
-            graphics_draw_round_rect(ctx, outlineRect, 0);
+            graphics_context_set_stroke_color(ctx, GColorFromRGB(255, 255, 0));
+            graphics_draw_rect(ctx, outlineRect);
         }
     }
 }
@@ -467,50 +465,18 @@ void ai_execute_steering_plan(carType *carPtr) {
     }
 }
 
-void ai_steering(carType *carPtr) {
-    if(carPtr->rank != 0) {
-        // Try to steer so we can overtake the car in front!
-        carType *carInFront = sortedGrid[carPtr->rank-1];
-        if((carInFront->worldPosition.x - carPtr->worldPosition.x) < 150) {
-            // We have to worry about the car in front
-            int diffFront = (carInFront->sprite->position.y - carPtr->sprite->position.y);
-            if(abs(diffFront) <= (CAR_WIDTH+1)) {
-                if(diffFront < 0) {
-                    // Car in front is to our left, so steer right (but not if too close to barrier)
-                    if(carInFront->sprite->position.y >= (TRACK_CENTRE_LINE - CAR_WIDTH - CAR_WIDTH)) {
-                        carPtr->worldPosition.y = car_steer(carPtr, -STEER_AMOUNT);
-                    } else {
-                        carPtr->worldPosition.y = car_steer(carPtr, +STEER_AMOUNT);
-                    }
-                } else if(diffFront > 0) {
-                    // Car in front is to our right, so steer left (but not if too close to barrier)
-                    if(carInFront->sprite->position.y <= (TRACK_CENTRE_LINE + CAR_WIDTH + CAR_WIDTH + CAR_WIDTH)) {
-                        carPtr->worldPosition.y = car_steer(carPtr, +STEER_AMOUNT);
-                    } else {
-                        carPtr->worldPosition.y = car_steer(carPtr, -STEER_AMOUNT);
-                    }
-                } else {
-                    // We are directly behind, so head towards the centre
-                    if(carPtr->sprite->position.y <= TRACK_CENTRE_LINE) {
-                        carPtr->worldPosition.y = car_steer(carPtr, +STEER_AMOUNT);                    
-                    } else {
-                        carPtr->worldPosition.y = car_steer(carPtr, -STEER_AMOUNT);
-                    }
-                }      
-            }
-        }
-    }         
-}
 
-
+// This is only called if this is NOT the player car
 void car_handle_ai(carType *carPtr) {
-    // ai_steering(carPtr);
-    // Experimental (replacing the line above)
     ai_create_steering_plan(carPtr);
     ai_execute_steering_plan(carPtr);
-    // This is only called if this is NOT the player car
-    //  and only one in sixty-four times on average!!
-    if((rand() & 3) == 0) switch_on_boost(carPtr);      
+    // This functionality is for the "per-car" AI
+    if(carPtr->rank >= carPtr->aiBoostRank) {
+        uint8_t r = rand() & 255;
+        if(r <= carPtr->aiBoostChance) {
+            switch_on_boost(carPtr);
+        }
+    }
 }
 
 
@@ -609,7 +575,9 @@ void reset_car(carType *carPtr) {
     carPtr->boostDurationMillis = 0;
     carPtr->rank = 1;
     carPtr->currentSpeed = 0;
-    carPtr->finished = 0; 
+    carPtr->finished = 0;
+    carPtr->aiBoostRank = 0; 
+    carPtr->aiBoostChance = 64;
     position_car(carPtr);
 }
 

@@ -36,6 +36,8 @@ struct CAR {
     uint16_t currentSpeed; 
     uint64_t finished;
     int steeringPlan; // This is a target for worldPosition.y
+    uint8_t aiBoostRank; // If we are at least this far down the field AND ..
+    uint8_t aiBoostChance; // .. if (rand() & 255) <= aiBoostChance, we can boost.
     time_t boostStartMillis;
     time_t boostDurationMillis;
     time_t maxBoostDurationMillis;
